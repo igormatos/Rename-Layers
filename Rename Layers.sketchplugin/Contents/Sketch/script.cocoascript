@@ -1,17 +1,51 @@
 var onRun = function(context) {
+
     var doc = context.document
     var selection = context.selection
+    var identifier = context.command.identifier()
 
     if (selection.count() == 0) {
         doc.showMessage("Please select one or more items.")
         return
 
     } else {
+        if (identifier == "replace-name") {
+            functions.replaceName(doc, selection)
+
+        } else if (identifier == "add-prefix") {
+            functions.addPrefix(doc, selection)
+
+        } else if (identifier == "add-suffix") {
+            functions.addSuffix(doc, selection)
+        }
+    }
+}
+
+var functions = {
+    "replaceName": function(doc, selection) {
         var newName = doc.askForUserInput_initialValue("New layer name", selection[0].name())
 
         var loop = selection.objectEnumerator()
         while (layer = loop.nextObject()) {
             layer.setName(newName)
         }
+    },
+    "addPrefix": function(doc, selection) {
+        var prefix = doc.askForUserInput_initialValue("Layer name prefix", "")
+
+        var loop = selection.objectEnumerator()
+        while (layer = loop.nextObject()) {
+            var newName = prefix+layer.name()
+            layer.setName(newName)
+        }
+    },
+    "addSuffix": function(doc, selection) {
+        var suffix = doc.askForUserInput_initialValue("Layer name suffix", "")
+
+        var loop = selection.objectEnumerator()
+        while (layer = loop.nextObject()) {
+            var newName = layer.name()+suffix
+            layer.setName(newName)
+        }
     }
-};
+}

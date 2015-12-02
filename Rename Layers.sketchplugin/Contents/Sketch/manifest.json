@@ -4,8 +4,8 @@
   "author": "Seb Jachec",
   "authorEmail": "hi@sebj.me",
   "homepage": "https://github.com/sebj/Rename-Layers",
-  "version": 1.0,
-  "bundleVersion": 1.0,
+  "version": 1.1,
+  "bundleVersion": 1.1,
   "compatibleVersion": 3.3,
   "identifier": "me.sebj.rename-layers",
   "commands": [
@@ -13,14 +13,30 @@
       "script": "script.cocoascript",
       "handler": "onRun",
       "shortcut": "control command r",
-      "name": "Rename Layers",
-      "identifier": "rename-layers"
+      "name": "Replace Name",
+      "identifier": "replace-name"
+    },
+    {
+      "script": "script.cocoascript",
+      "handler": "onRun",
+      "shortcut": "",
+      "name": "Add Prefix",
+      "identifier": "add-prefix"
+    },
+    {
+      "script": "script.cocoascript",
+      "handler": "onRun",
+      "shortcut": "",
+      "name": "Add Suffix",
+      "identifier": "add-suffix"
     }
   ],
   "menu": {
-    "isRoot": true,
+    "isRoot": false,
     "items": [
-      "rename-layers"
+      "replace-name",
+      "add-prefix",
+      "add-suffix"
     ],
     "title": "Rename Layers"
   }
