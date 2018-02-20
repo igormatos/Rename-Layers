@@ -1,10 +1,10 @@
 {
-  "name": "Rename Layers",
-  "description": "Rename multiple layers at once",
-  "author": "Seb Jachec",
+  "name": "Liferay Utilities",
+  "description": "",
+  "author": "Igor Matos (forked Seb Jachec)",
   "authorEmail": "hi@sebj.me",
-  "homepage": "https://github.com/sebj/Rename-Layers",
-  "version": 1.1,
+  "homepage": "https://github.com/igormatos/Rename-Layers",
+  "version": 1.2,
   "bundleVersion": 1.1,
   "compatibleVersion": 3.3,
   "identifier": "me.sebj.rename-layers",
@@ -12,7 +12,7 @@
     {
       "script": "script.cocoascript",
       "handler": "onRun",
-      "shortcut": "control command r",
+      "shortcut": "",
       "name": "Replace Name",
       "identifier": "replace-name"
     },
@@ -26,9 +26,30 @@
     {
       "script": "script.cocoascript",
       "handler": "onRun",
+      "shortcut": "control command c",
+      "name": "Remove Copy",
+      "identifier": "remove-copy"
+    },
+    {
+      "script": "script.cocoascript",
+      "handler": "onRun",
+      "shortcut": "control command r",
+      "name": "Reorder Folders",
+      "identifier": "format-names"
+    },
+    {
+      "script": "script.cocoascript",
+      "handler": "onRun",
       "shortcut": "",
-      "name": "Add Suffix",
-      "identifier": "add-suffix"
+      "name": "Space to underscore",
+      "identifier": "space-to-underscore"
+    },
+    {
+      "script": "script.cocoascript",
+      "handler": "onRun",
+      "shortcut": "",
+      "name": "Lowercase",
+      "identifier": "to-lowercase"
     }
   ],
   "menu": {
@@ -36,8 +57,12 @@
     "items": [
       "replace-name",
       "add-prefix",
-      "add-suffix"
+      "add-suffix",
+      "format-names",
+      "remove-copy",
+      "space-to-underscore",
+      "to-lowercase"
     ],
-    "title": "Rename Layers"
+    "title": "Liferay"
   }
 }

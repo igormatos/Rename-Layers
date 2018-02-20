@@ -1,5 +1,4 @@
 var onRun = function(context) {
-
     var doc = context.document
     var selection = context.selection
     var identifier = context.command.identifier()
@@ -7,17 +6,20 @@ var onRun = function(context) {
     if (selection.count() == 0) {
         doc.showMessage("Please select one or more items.")
         return
-
     } else {
         if (identifier == "replace-name") {
             functions.replaceName(doc, selection)
-
         } else if (identifier == "add-prefix") {
             functions.addPrefix(doc, selection)
-
-        } else if (identifier == "add-suffix") {
-            functions.addSuffix(doc, selection)
-        }
+        } else if (identifier == "remove-copy") {
+            functions.removeCopy(doc, selection)
+        } else if (identifier == "format-names") {
+           functions.formatNames(doc, selection)
+       } else if (identifier == "space-to-underscore") {
+          functions.spaceToUnderscore(doc, selection)
+       } else if (identifier == "to-lowercase") {
+         functions.toLowercase(doc, selection)
+     }
     }
 }
 
@@ -31,21 +33,99 @@ var functions = {
         }
     },
     "addPrefix": function(doc, selection) {
-        var prefix = doc.askForUserInput_initialValue("Layer name prefix", "")
+      var prefix = doc.askForUserInput_initialValue("Prefix to Selection", "")
 
-        var loop = selection.objectEnumerator()
-        while (layer = loop.nextObject()) {
-            var newName = prefix+layer.name()
-            layer.setName(newName)
-        }
+      var loop = selection.objectEnumerator()
+      while (layer = loop.nextObject()) {
+          var oldName = layer.name()
+          var newName = prefix + oldName
+
+          layer.setName(newName)
+      }
     },
-    "addSuffix": function(doc, selection) {
-        var suffix = doc.askForUserInput_initialValue("Layer name suffix", "")
+    "removeCopy": function(doc, selection) {
+      var count = 0;
+
+      var loop = selection.objectEnumerator()
+      while (layer = loop.nextObject()) {
+          var oldName = layer.name()
+          var copyStartIndex = oldName.indexOf("copy");
+
+          if ( copyStartIndex !== -1 ) {
+            var newName = oldName.substr(0, copyStartIndex - 1)
+            layer.setName(newName)
+
+            count = count + 1
+          }
+
+      }
+
+      [doc showMessage: "Removed: " + count + " copy"];
+
+      function endsWith(str, suffix) {
+          return str.indexOf(suffix, str.length - suffix.length) !== -1;
+      }
+    },
+    "formatNames": function(doc, selection) {
+          //var initialNumber = doc.askForUserInput_initialValue("Starts Number Sequence From:", "")
+          var loop = selection.objectEnumerator()
+          var selectionCount = [selection count]
+          var counter = selectionCount;
+
+          for (var i=0; i<selectionCount; i++) {
+              var layer = selection[i]
+
+              var oldName = layer.name().substr(2)
+
+              var counterAux = counter.toString();
+              if (counter < 10) {
+                counterAux = "0" + counterAux;
+              }
+
+              var end = oldName.length - 5;
+              if ( endsWith(oldName, "copy") ) {
+                var oldName = oldName.substr(0, end)
+              }
+
+              var newName = counterAux + oldName
+
+              layer.setName(newName)
+
+              counter = counter - 1
+          }
+
+          function endsWith(str, suffix) {
+              return str.indexOf(suffix, str.length - suffix.length) !== -1;
+          }
+
+          [doc showMessage: "Renamed:" + selectionCount + " folders"];
+
+    },  "spaceToUnderscore": function(doc, selection) {
+        var count = 0;
 
         var loop = selection.objectEnumerator()
         while (layer = loop.nextObject()) {
-            var newName = layer.name()+suffix
-            layer.setName(newName)
+            var oldName = layer.name();
+            var newName = oldName.replace(/ /g, "_");
+            layer.setName(newName);
+            count++;
         }
-    }
+
+        [doc showMessage: "Changed: " + count + " layers"];
+
+      },  "toLowercase": function(doc, selection) {
+          var count = 0;
+
+          var loop = selection.objectEnumerator()
+          while (layer = loop.nextObject()) {
+              var oldName = layer.name();
+              var newName = oldName.toLowerCase();
+              layer.setName(newName);
+          }
+
+          [doc showMessage: "Changed: " + count + " layers"];
+
+
+        }
+
 }
