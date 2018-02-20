@@ -14,12 +14,14 @@ var onRun = function(context) {
         } else if (identifier == "remove-copy") {
             functions.removeCopy(doc, selection)
         } else if (identifier == "format-names") {
-           functions.formatNames(doc, selection)
-       } else if (identifier == "space-to-underscore") {
-          functions.spaceToUnderscore(doc, selection)
-       } else if (identifier == "to-lowercase") {
-         functions.toLowercase(doc, selection)
-     }
+            functions.formatNames(doc, selection)
+        } else if (identifier == "space-to-underscore") {
+            functions.spaceToUnderscore(doc, selection)
+        } else if (identifier == "to-lowercase") {
+            functions.toLowercase(doc, selection)
+        } else if (identifier == "organize-layers") {
+            functions.organizeLayers(doc, selection)
+        }
     }
 }
 
@@ -33,72 +35,72 @@ var functions = {
         }
     },
     "addPrefix": function(doc, selection) {
-      var prefix = doc.askForUserInput_initialValue("Prefix to Selection", "")
+        var prefix = doc.askForUserInput_initialValue("Prefix to Selection", "")
 
-      var loop = selection.objectEnumerator()
-      while (layer = loop.nextObject()) {
-          var oldName = layer.name()
-          var newName = prefix + oldName
+        var loop = selection.objectEnumerator()
+        while (layer = loop.nextObject()) {
+            var oldName = layer.name()
+            var newName = prefix + oldName
 
-          layer.setName(newName)
-      }
+            layer.setName(newName)
+        }
     },
     "removeCopy": function(doc, selection) {
-      var count = 0;
+        var count = 0;
 
-      var loop = selection.objectEnumerator()
-      while (layer = loop.nextObject()) {
-          var oldName = layer.name()
-          var copyStartIndex = oldName.indexOf("copy");
+        var loop = selection.objectEnumerator()
+        while (layer = loop.nextObject()) {
+            var oldName = layer.name()
+            var copyStartIndex = oldName.indexOf("copy");
 
-          if ( copyStartIndex !== -1 ) {
-            var newName = oldName.substr(0, copyStartIndex - 1)
-            layer.setName(newName)
+            if ( copyStartIndex !== -1 ) {
+                var newName = oldName.substr(0, copyStartIndex - 1)
+                layer.setName(newName)
 
-            count = count + 1
-          }
+                count = count + 1
+            }
 
-      }
+        }
 
-      [doc showMessage: "Removed: " + count + " copy"];
+        [doc showMessage: "Removed: " + count + " copy"];
 
-      function endsWith(str, suffix) {
-          return str.indexOf(suffix, str.length - suffix.length) !== -1;
-      }
+        function endsWith(str, suffix) {
+            return str.indexOf(suffix, str.length - suffix.length) !== -1;
+        }
     },
     "formatNames": function(doc, selection) {
-          //var initialNumber = doc.askForUserInput_initialValue("Starts Number Sequence From:", "")
-          var loop = selection.objectEnumerator()
-          var selectionCount = [selection count]
-          var counter = selectionCount;
+        //var initialNumber = doc.askForUserInput_initialValue("Starts Number Sequence From:", "")
+        var loop = selection.objectEnumerator()
+        var selectionCount = [selection count]
+        var counter = selectionCount;
 
-          for (var i=0; i<selectionCount; i++) {
-              var layer = selection[i]
+        for (var i=0; i<selectionCount; i++) {
+            var layer = selection[i]
 
-              var oldName = layer.name().substr(2)
+            var oldName = layer.name().substr(2)
 
-              var counterAux = counter.toString();
-              if (counter < 10) {
+            var counterAux = counter.toString();
+            if (counter < 10) {
                 counterAux = "0" + counterAux;
-              }
+            }
 
-              var end = oldName.length - 5;
-              if ( endsWith(oldName, "copy") ) {
+            var end = oldName.length - 5;
+            if ( endsWith(oldName, "copy") ) {
                 var oldName = oldName.substr(0, end)
-              }
+            }
 
-              var newName = counterAux + oldName
+            var newName = counterAux + oldName
 
-              layer.setName(newName)
+            layer.setName(newName)
 
-              counter = counter - 1
-          }
+            counter = counter - 1
+        }
 
-          function endsWith(str, suffix) {
-              return str.indexOf(suffix, str.length - suffix.length) !== -1;
-          }
+        function endsWith(str, suffix) {
+            return str.indexOf(suffix, str.length - suffix.length) !== -1;
+        }
 
-          [doc showMessage: "Renamed:" + selectionCount + " folders"];
+        [doc showMessage: "Renamed:" + selectionCount + " folders"];
 
     },  "spaceToUnderscore": function(doc, selection) {
         var count = 0;
@@ -113,19 +115,62 @@ var functions = {
 
         [doc showMessage: "Changed: " + count + " layers"];
 
-      },  "toLowercase": function(doc, selection) {
-          var count = 0;
+    },  "toLowercase": function(doc, selection) {
+        var count = 0;
 
-          var loop = selection.objectEnumerator()
-          while (layer = loop.nextObject()) {
-              var oldName = layer.name();
-              var newName = oldName.toLowerCase();
-              layer.setName(newName);
-          }
-
-          [doc showMessage: "Changed: " + count + " layers"];
-
-
+        var loop = selection.objectEnumerator()
+        while (layer = loop.nextObject()) {
+            var oldName = layer.name();
+            var newName = oldName.toLowerCase();
+            layer.setName(newName);
         }
+
+        [doc showMessage: "Changed: " + count + " layers"];
+
+    }, "getLayersMatrix": function(doc, selection) {
+        var layerObjectReferences = [];
+
+        var loop = selection.objectEnumerator()
+        while (layer = loop.nextObject()) {
+            let layerRect = layer.frame();
+            let layerRef = {
+                'x':layerRect.x,
+                'y':layerRect.y,
+                'reference': layer.container()
+            };
+            layerObjectReferences.push(JSON.parse(layerRef));
+        }
+
+        return layerObjectReferences;
+
+    }, "sortLayerObjectReferences": function(layerObjectReferences) {
+        var result = layerObjectReferences.sort(function (a, b) {
+            if (a.y > b.y){
+                return -1;
+            }
+
+            if (a.y < b.y){
+                return 1;
+            }
+
+            if (a.x > b.x){
+                return -1;
+            }
+
+            if (a.x < b.x){
+                return 1;
+            }
+            return 0;
+        });
+
+        return result;
+
+    }, "push2LayersPanel": function(sortedMatrix) {
+
+    }, "organizeLayers": function(doc, selection){
+        var matrix = getLayersMatrix(doc, selection);
+        var sorted = sortLayerMatrix(matrix);
+        push2LayersPanel(sorted);
+    }
 
 }
