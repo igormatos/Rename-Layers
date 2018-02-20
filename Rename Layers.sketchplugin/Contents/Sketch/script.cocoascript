@@ -1,3 +1,5 @@
+@import 'utils.cocoascript'
+
 var onRun = function(context) {
     var doc = context.document
     var selection = context.selection
@@ -102,7 +104,8 @@ var functions = {
 
         [doc showMessage: "Renamed:" + selectionCount + " folders"];
 
-    },  "spaceToUnderscore": function(doc, selection) {
+    },
+    "spaceToUnderscore": function(doc, selection) {
         var count = 0;
 
         var loop = selection.objectEnumerator()
@@ -115,7 +118,8 @@ var functions = {
 
         [doc showMessage: "Changed: " + count + " layers"];
 
-    },  "toLowercase": function(doc, selection) {
+    },
+    "toLowercase": function(doc, selection) {
         var count = 0;
 
         var loop = selection.objectEnumerator()
@@ -127,7 +131,8 @@ var functions = {
 
         [doc showMessage: "Changed: " + count + " layers"];
 
-    }, "getLayersMatrix": function(doc, selection) {
+    },
+    "getLayersReferences": function(doc, selection) {
         var layerObjectReferences = [];
 
         var loop = selection.objectEnumerator()
@@ -138,12 +143,13 @@ var functions = {
                 'y':layerRect.y,
                 'reference': layer.container()
             };
-            layerObjectReferences.push(JSON.parse(layerRef));
+            layerObjectReferences.push(layerRef);
         }
 
         return layerObjectReferences;
 
-    }, "sortLayerObjectReferences": function(layerObjectReferences) {
+    },
+    "sortLayerObjectReferences": function(layerObjectReferences) {
         var result = layerObjectReferences.sort(function (a, b) {
             if (a.y > b.y){
                 return -1;
@@ -160,17 +166,31 @@ var functions = {
             if (a.x < b.x){
                 return 1;
             }
+
             return 0;
         });
 
         return result;
 
-    }, "push2LayersPanel": function(sortedMatrix) {
+    },
+    "push2LayersPanel": function(sortedReferences, doc, selection) {
 
-    }, "organizeLayers": function(doc, selection){
-        var matrix = getLayersMatrix(doc, selection);
-        var sorted = sortLayerMatrix(matrix);
-        push2LayersPanel(sorted);
+        var loop = selection.objectEnumerator()
+
+        while (layer = loop.nextObject()) {
+            for (let i = 0; i < sortedReferences.length; i++) {
+                if (layer == sortedReferences[i].reference) {
+                    layer.remove();
+                }
+                new Layer(sortedReferences[i].reference, doc);
+            }
+        }
+
+    },
+    "organizeLayers": function(doc, selection){
+        var refs = getLayersReferences(doc, selection);
+        var sorted = sortLayerObjectReferences(refs);
+        push2LayersPanel(sorted, doc, selection);
     }
 
 }
