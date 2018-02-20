@@ -50,6 +50,13 @@
       "shortcut": "",
       "name": "Lowercase",
       "identifier": "to-lowercase"
+    },
+    {
+      "script": "script.cocoascript",
+      "handler": "onRun",
+      "shortcut": "",
+      "name": "Organize Layers",
+      "identifier": "organize-layers"
     }
   ],
   "menu": {
@@ -61,7 +68,8 @@
       "format-names",
       "remove-copy",
       "space-to-underscore",
-      "to-lowercase"
+      "to-lowercase",
+      "organize-layers"
     ],
     "title": "Liferay"
   }
