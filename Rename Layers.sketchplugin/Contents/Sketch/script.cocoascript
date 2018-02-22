@@ -1,5 +1,3 @@
-@import 'utils.cocoascript'
-
 var onRun = function(context) {
     var doc = context.document
     var selection = context.selection
@@ -132,65 +130,98 @@ var functions = {
         [doc showMessage: "Changed: " + count + " layers"];
 
     },
-    "getLayersReferences": function(doc, selection) {
-        var layerObjectReferences = [];
 
-        var loop = selection.objectEnumerator()
-        while (layer = loop.nextObject()) {
-            let layerRect = layer.frame();
-            let layerRef = {
-                'x':layerRect.x,
-                'y':layerRect.y,
-                'reference': layer.container()
-            };
-            layerObjectReferences.push(layerRef);
+    // "push2LayersPanel": function(sortedReferences, doc, selection) {
+
+    //     var loop = selection.objectEnumerator()
+
+    //     while (layer = loop.nextObject()) {
+    //         for (let i = 0; i < sortedReferences.length; i++) {
+    //             if (layer == sortedReferences[i].reference) {
+    //                 layer.remove();
+    //             }
+    //         }
+    //     }
+
+    //     sortedReferences.forEach(element => {
+
+    //     });
+
+    //     // for (let j = 0; j < sortedReferences.length; j++) {
+    //     //     array.forEach(element => {
+
+    //     //     });
+    //     // }
+
+    // },
+
+    "organizeLayers": function(context){
+
+        var doc = context.document
+        var selection = context.selection
+        var identifier = context.command.identifier()
+
+        var refs = getLayersReferences(selection);
+
+        sortLayerObjectReferences(refs);
+        //push2LayersPanel(sorted, doc, selection);
+
+
+
+
+
+        function getLayersReferences(sel) {
+            var layerObjectReferences = [];
+
+            var loop = sel.objectEnumerator()
+            while (layer = loop.nextObject()) {
+
+                var layerRect = layer.frame();
+
+                var layerRef = {
+                    'x':layerRect.x(),
+                    'y':layerRect.y(),
+                    'reference': layer
+                    //'reference': layer.container()
+                };
+                log(layerRef);
+                layerObjectReferences.push(layerRef);
+            }
+
+            return layerObjectReferences;
+
         }
 
-        return layerObjectReferences;
-
-    },
-    "sortLayerObjectReferences": function(layerObjectReferences) {
-        var result = layerObjectReferences.sort(function (a, b) {
-            if (a.y > b.y){
-                return -1;
-            }
-
-            if (a.y < b.y){
-                return 1;
-            }
-
-            if (a.x > b.x){
-                return -1;
-            }
-
-            if (a.x < b.x){
-                return 1;
-            }
-
-            return 0;
-        });
-
-        return result;
-
-    },
-    "push2LayersPanel": function(sortedReferences, doc, selection) {
-
-        var loop = selection.objectEnumerator()
-
-        while (layer = loop.nextObject()) {
-            for (let i = 0; i < sortedReferences.length; i++) {
-                if (layer == sortedReferences[i].reference) {
-                    layer.remove();
+        function sortLayerObjectReferences (layerObjectReferences) {
+            var result = layerObjectReferences.sort(function (a, b) {
+                if (a.y > b.y){
+                    //a.reference.moveBackward();
+                    return -1;
                 }
-                new Layer(sortedReferences[i].reference, doc);
-            }
+
+                if (a.y < b.y){
+                    a.reference.moveForward();
+                    return 1;
+                }
+
+                if (a.x > b.x){
+                    //a.reference.moveBackward();
+                    return -1;
+                }
+
+                if (a.x < b.x){
+                    a.reference.moveForward();
+                    return 1;
+                }
+
+                return 0;
+            });
+
+            log(JSON.stringify(result));
+            //return result;
+
         }
 
-    },
-    "organizeLayers": function(doc, selection){
-        var refs = getLayersReferences(doc, selection);
-        var sorted = sortLayerObjectReferences(refs);
-        push2LayersPanel(sorted, doc, selection);
     }
 
 }
