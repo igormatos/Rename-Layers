@@ -166,10 +166,6 @@ var functions = {
         sortLayerObjectReferences(refs);
         //push2LayersPanel(sorted, doc, selection);
 
-
-
-
-
         function getLayersReferences(sel) {
             var layerObjectReferences = [];
 
@@ -178,13 +174,14 @@ var functions = {
 
                 var layerRect = layer.frame();
 
+                log(layer);
+
                 var layerRef = {
-                    'x':layerRect.x(),
+                    'x':layerRect.x(), //shape
                     'y':layerRect.y(),
                     'reference': layer
                     //'reference': layer.container()
                 };
-                log(layerRef);
                 layerObjectReferences.push(layerRef);
             }
 
@@ -194,6 +191,8 @@ var functions = {
 
         function sortLayerObjectReferences (layerObjectReferences) {
             var result = layerObjectReferences.sort(function (a, b) {
+                log('aqui!');
+                log(a.reference);
                 if (a.y > b.y){
                     //a.reference.moveBackward();
                     return -1;
