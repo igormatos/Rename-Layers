@@ -1,3 +1,5 @@
+@import 'inventory.js';
+
 var onRun = function(context) {
     var doc = context.document
     var selection = context.selection
@@ -20,7 +22,7 @@ var onRun = function(context) {
         } else if (identifier == "to-lowercase") {
             functions.toLowercase(doc, selection)
         } else if (identifier == "organize-layers") {
-            functions.organizeLayers(doc, selection)
+            functions.organizeLayers(context)
         }
     }
 }
@@ -156,7 +158,6 @@ var functions = {
     // },
 
     "organizeLayers": function(context){
-
         var doc = context.document
         var selection = context.selection
         var identifier = context.command.identifier()
@@ -170,11 +171,10 @@ var functions = {
             var layerObjectReferences = [];
 
             var loop = sel.objectEnumerator()
+
             while (layer = loop.nextObject()) {
 
                 var layerRect = layer.frame();
-
-                log(layer);
 
                 var layerRef = {
                     'x':layerRect.x(), //shape
@@ -182,6 +182,7 @@ var functions = {
                     'reference': layer
                     //'reference': layer.container()
                 };
+
                 layerObjectReferences.push(layerRef);
             }
 
@@ -191,15 +192,13 @@ var functions = {
 
         function sortLayerObjectReferences (layerObjectReferences) {
             var result = layerObjectReferences.sort(function (a, b) {
-                log('aqui!');
-                log(a.reference);
                 if (a.y > b.y){
                     //a.reference.moveBackward();
                     return -1;
                 }
 
                 if (a.y < b.y){
-                    a.reference.moveForward();
+                    sendForward(a.reference);
                     return 1;
                 }
 
@@ -209,16 +208,34 @@ var functions = {
                 }
 
                 if (a.x < b.x){
-                    a.reference.moveForward();
+                    sendForward(a.reference);
                     return 1;
                 }
 
                 return 0;
             });
 
-            log(JSON.stringify(result));
-            //return result;
+            log('Depois: ');
+            log(result);
 
+        }
+
+        function sendAction(commandToPerform) {
+            try {
+                [NSApp sendAction:commandToPerform to:nil from:doc]
+            } catch(e) {
+                my.log(e)
+            }
+        };
+
+        function sendBackward() {
+            sendAction('moveBackward:');
+        }
+        function sendForward() {
+            sendAction('moveForward:');
+        }
+        function sendBack() {
+            sendAction('moveToBack:');
         }
 
     }
