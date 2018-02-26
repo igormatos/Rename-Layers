@@ -4,7 +4,7 @@
   "author": "Igor Matos (forked Seb Jachec)",
   "authorEmail": "hi@sebj.me",
   "homepage": "https://github.com/igormatos/Rename-Layers",
-  "version": 1.2,
+  "version": 1.3,
   "bundleVersion": 1.1,
   "compatibleVersion": 3.3,
   "identifier": "me.sebj.rename-layers",

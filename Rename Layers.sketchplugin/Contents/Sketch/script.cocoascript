@@ -131,30 +131,6 @@ var functions = {
 
     },
 
-    // "push2LayersPanel": function(sortedReferences, doc, selection) {
-
-    //     var loop = selection.objectEnumerator()
-
-    //     while (layer = loop.nextObject()) {
-    //         for (let i = 0; i < sortedReferences.length; i++) {
-    //             if (layer == sortedReferences[i].reference) {
-    //                 layer.remove();
-    //             }
-    //         }
-    //     }
-
-    //     sortedReferences.forEach(element => {
-
-    //     });
-
-    //     // for (let j = 0; j < sortedReferences.length; j++) {
-    //     //     array.forEach(element => {
-
-    //     //     });
-    //     // }
-
-    // },
-
     "organizeLayers": function(context){
         var doc = context.document;
 
@@ -163,10 +139,9 @@ var functions = {
         var refs = getLayersReferences(selection);
 
         var sorted = sortLayerObjectReferences(refs);
-
         //push2LayersPanel(sorted, doc, selection);
 
-        //TODO- Can be better, to treat different artboards, groups.
+        //TODO- Can be better, using recursion e.g
         var artboard = selection[0].parentGroup();
 
         //Removing layers
@@ -215,7 +190,7 @@ var functions = {
                 }
 
                 if (a.y < b.y){
-                    //sendForward(a.reference);
+                    sendForward(a.reference);
                     return 1;
                 }
 
@@ -224,7 +199,7 @@ var functions = {
                 }
 
                 if (a.x < b.x){
-                    //sendForward(a.reference);
+                    sendForward(a.reference);
                     return 1;
                 }
 
@@ -241,7 +216,7 @@ var functions = {
         };
 
         /**
-        * An wrap to manipulate layers position on container.
+        * An wrap to manipulate a layer position on container.
         * @param commandToPerform
         */
         function sendAction(commandToPerform) {
