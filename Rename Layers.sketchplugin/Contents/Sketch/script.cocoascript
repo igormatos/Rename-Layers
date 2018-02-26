@@ -1,5 +1,3 @@
-@import 'inventory.js';
-
 var onRun = function(context) {
     var doc = context.document
     var selection = context.selection
@@ -158,15 +156,31 @@ var functions = {
     // },
 
     "organizeLayers": function(context){
-        var doc = context.document
-        var selection = context.selection
-        var identifier = context.command.identifier()
+        var doc = context.document;
+
+        var selection = context.selection; // Getting selectioned items
 
         var refs = getLayersReferences(selection);
 
-        sortLayerObjectReferences(refs);
+        var sorted = sortLayerObjectReferences(refs);
+
         //push2LayersPanel(sorted, doc, selection);
 
+        //TODO- Can be better, to treat different artboards, groups.
+        var artboard = selection[0].parentGroup();
+
+        //Removing layers
+        removeAllLayersFromArtboard(artboard);
+
+        //Adding sorted layers on artboard.
+        artboard.addLayers(sorted);
+
+        /**
+        *
+        * @param sel Current context selection
+        * @returns <Array> returns an array of objects containing
+        *  position and reference of each layer in an artboard.
+        */
         function getLayersReferences(sel) {
             var layerObjectReferences = [];
 
@@ -177,10 +191,9 @@ var functions = {
                 var layerRect = layer.frame();
 
                 var layerRef = {
-                    'x':layerRect.x(), //shape
-                    'y':layerRect.y(),
-                    'reference': layer
-                    //'reference': layer.container()
+                    'x':layerRect.x(), //An int with x pos in frame
+                    'y':layerRect.y(), //An int with y pos in frame
+                    'reference': layer // MSShapeGroup Object
                 };
 
                 layerObjectReferences.push(layerRef);
@@ -190,41 +203,52 @@ var functions = {
 
         }
 
+        /**
+        *
+        * @param layerObjectReferences Array of objects obtained from getLayersReferences
+        * @returns An array containing references objects sorted by x,y position.
+        */
         function sortLayerObjectReferences (layerObjectReferences) {
             var result = layerObjectReferences.sort(function (a, b) {
                 if (a.y > b.y){
-                    //a.reference.moveBackward();
                     return -1;
                 }
 
                 if (a.y < b.y){
-                    sendForward(a.reference);
+                    //sendForward(a.reference);
                     return 1;
                 }
 
                 if (a.x > b.x){
-                    //a.reference.moveBackward();
                     return -1;
                 }
 
                 if (a.x < b.x){
-                    sendForward(a.reference);
+                    //sendForward(a.reference);
                     return 1;
                 }
 
                 return 0;
             });
 
-            log('Depois: ');
-            log(result);
+            var references =[];
 
-        }
+            for(var i=0;i<result.length;i++){
+                references.push(result[i].reference);
+            }
 
+            return references;
+        };
+
+        /**
+        * An wrap to manipulate layers position on container.
+        * @param commandToPerform
+        */
         function sendAction(commandToPerform) {
             try {
-                [NSApp sendAction:commandToPerform to:nil from:doc]
+                [NSApp sendAction:commandToPerform to:nil from:doc];
             } catch(e) {
-                my.log(e)
+                my.log(e);
             }
         };
 
@@ -236,6 +260,13 @@ var functions = {
         }
         function sendBack() {
             sendAction('moveToBack:');
+        }
+
+        function removeAllLayersFromArtboard (artboard) {
+            var layers = artboard.children().objectEnumerator();
+            while (layer = layers.nextObject()) {
+                artboard.removeLayer(layer);
+            }
         }
 
     }
